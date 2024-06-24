@@ -7,6 +7,7 @@ import csv
 import math
 from typing import List, Dict, Any
 
+
 class Server:
     """Server class to paginate a database of popular baby names.
     """
@@ -37,7 +38,9 @@ class Server:
             }
         return self.__indexed_dataset
 
-    def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict[str, Any]:
+    def get_hyper_index(
+        self, index: int = None, page_size: int = 10
+    ) -> Dict[str, Any]:
         """
         Returns a dictionary with pagination data.
 
@@ -48,8 +51,12 @@ class Server:
         Returns:
             A dictionary containing pagination information.
         """
-        assert isinstance(index, int) and index >= 0, "Index must be a non-negative integer."
-        assert isinstance(page_size, int) and page_size > 0, "Page size must be a positive integer."
+        assert isinstance(
+            index, int
+        ) and index >= 0, "Index must be a non-negative integer."
+        assert isinstance(
+            page_size, int
+        ) and page_size > 0, "Page size must be a positive integer."
 
         dataset = self.indexed_dataset()
         total_items = len(dataset)
