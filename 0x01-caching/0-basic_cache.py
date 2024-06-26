@@ -5,6 +5,7 @@ BasicCache module
 
 from base_caching import BaseCaching
 
+
 class BasicCache(BaseCaching):
     """ BasicCache class
     Inherits from BaseCaching and is a basic caching system
