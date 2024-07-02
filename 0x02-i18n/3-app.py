@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
-2-app.py
+3-app.py
 
-This script demonstrates the setup of a Flask app with
-Flask-Babel extension for i18n.
+Flask app demonstrating internationalization (i18n) using Flask-Babel.
 
 Requirements:
 - Ubuntu 18.04 LTS
@@ -13,7 +12,7 @@ Requirements:
 - Python file ends with a new line
 """
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template
 from flask_babel import Babel, _
 
 app = Flask(__name__)
@@ -46,7 +45,9 @@ def get_locale():
     Returns:
     - Best-matching language code ('en' or 'fr').
     """
-    return request.accept_languages.best_match(app.config['LANGUAGES'])
+    # Replace with logic to determine the best-matching language
+    # For now, use a simple example:
+    return 'en'
 
 
 @app.route('/')
@@ -55,10 +56,10 @@ def index():
     Route for the index page.
 
     Returns:
-    - Rendered template '2-index.html' with translated messages.
+    - Rendered template '3-index.html' with translated messages.
     """
     return render_template(
-        '2-index.html', title=_('home_title'), header=_('home_header')
+        '3-index.html', title=_('home_title'), header=_('home_header')
     )
 
 
