@@ -7,14 +7,12 @@ from flask import Flask, render_template
 
 app = Flask(__name__)
 
-
 @app.route('/')
 def index():
     """
-    Remder the index page.
+    Renders the index page.
     """
     return render_template('index.html')
 
-
-if __name__ == '_main__':
+if __name__ == '__main__':
     app.run(debug=True)
