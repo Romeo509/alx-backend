@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-'''Task 4: Force locale with URL parameter
+'''
+I am very tired right now i want to sleep
 '''
 
 from typing import Dict, Union
@@ -30,7 +31,8 @@ users = {
 
 
 def get_user() -> Union[Dict, None]:
-    """Retrieves a user based on a user id.
+    """
+    It will retrieve the user id
     """
     login_id = request.args.get('login_as')
     if login_id:
@@ -40,7 +42,8 @@ def get_user() -> Union[Dict, None]:
 
 @app.before_request
 def before_request() -> None:
-    """Performs some routines before each request's resolution.
+    """
+    OMG This one Performs routines before request's resolution.
     """
 
     g.user = get_user()
@@ -48,10 +51,8 @@ def before_request() -> None:
 
 @babel.localeselector
 def get_locale() -> str:
-    """Retrieves the locale for a web page.
-
-    Returns:
-        str: best match
+    """
+    It will retireve you local page
     """
     locale = request.args.get('locale')
     if locale in app.config['LANGUAGES']:
@@ -62,9 +63,6 @@ def get_locale() -> str:
 @app.route('/')
 def index() -> str:
     '''default route
-
-    Returns:
-        html: homepage
     '''
     return render_template("5-index.html")
 
