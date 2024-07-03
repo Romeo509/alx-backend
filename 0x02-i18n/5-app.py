@@ -1,39 +1,25 @@
 #!/usr/bin/env python3
-"""
-5-app.py
+'''Task 4: Force locale with URL parameter
+'''
 
-
-Requirements:
-- Ubuntu 18.04 LTS
-- Python 3.7
-- pycodestyle (version 2.5)
-- README.md file present
-- Python file ends with a new line
-"""
-
+from typing import Dict, Union
 from flask import Flask, render_template, request, g
-from flask_babel import Babel, _
-import pytz
-
-app = Flask(__name__)
-babel = Babel(app)
+from flask_babel import Babel
 
 
 class Config:
-    """
-    Config class for Flask app configuration.
+    '''Config class'''
 
-    Attributes:
-    - LANGUAGES: List of available languages.
-    - BABEL_DEFAULT_LOCALE: Default locale for Babel.
-    - BABEL_DEFAULT_TIMEZONE: Default timezone for Babel.
-    """
+    DEBUG = True
     LANGUAGES = ["en", "fr"]
-    BABEL_DEFAULT_LOCALE = 'en'
-    BABEL_DEFAULT_TIMEZONE = 'UTC'
+    BABEL_DEFAULT_LOCALE = "en"
+    BABEL_DEFAULT_TIMEZONE = "UTC"
 
 
+app = Flask(__name__)
 app.config.from_object(Config)
+app.url_map.strict_slashes = False
+babel = Babel(app)
 
 users = {
     1: {"name": "Balou", "locale": "fr", "timezone": "Europe/Paris"},
@@ -43,55 +29,45 @@ users = {
 }
 
 
-def get_user():
+def get_user() -> Union[Dict, None]:
+    """Retrieves a user based on a user id.
     """
-    Function to get a user dictionary by ID.
-
-    Returns:
-    - User dictionary or None if the user ID is not found.
-    """
-    try:
-        user_id = int(request.args.get('login_as'))
-        return users.get(user_id)
-    except (TypeError, ValueError):
-        return None
+    login_id = request.args.get('login_as')
+    if login_id:
+        return users.get(int(login_id))
+    return None
 
 
 @app.before_request
-def before_request():
+def before_request() -> None:
+    """Performs some routines before each request's resolution.
     """
-    Function to be executed before each request.
-    Sets g.user to the user dictionary if a valid user is found.
-    """
+
     g.user = get_user()
 
 
 @babel.localeselector
-def get_locale():
-    """
-    Function to determine the best-matching language for the user based on
+def get_locale() -> str:
+    """Retrieves the locale for a web page.
 
     Returns:
-    - Best-matching language code ('en' or 'fr').
+        str: best match
     """
     locale = request.args.get('locale')
-    if locale and locale in app.config['LANGUAGES']:
+    if locale in app.config['LANGUAGES']:
         return locale
-    if g.user and g.user['locale'] in app.config['LANGUAGES']:
-        return g.user['locale']
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
 @app.route('/')
-def index():
-    """
-    Route for the index page.
+def index() -> str:
+    '''default route
 
     Returns:
-    - Rendered template '5-index.html' with translated messages.
-    """
-    return render_template('5-index.html')
+        html: homepage
+    '''
+    return render_template("5-index.html")
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run()
