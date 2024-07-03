@@ -1,13 +1,3 @@
-#!/bin/bash
-
-# Ensure the script is run from the 0x02-i18n directory
-if [ "$(basename $(pwd))" != "0x02-i18n" ]; then
-    echo "Please run this script from the 0x02-i18n directory."
-    exit 1
-fi
-
-# Create 4-app.py
-cat <<EOF > 4-app.py
 #!/usr/bin/env python3
 """
 4-app.py
@@ -69,38 +59,3 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True)
-EOF
-
-# Make 4-app.py executable
-chmod +x 4-app.py
-
-# Create templates directory if it doesn't exist
-mkdir -p templates
-
-# Create 4-index.html
-cat <<EOF > templates/4-index.html
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ title }}</title>
-</head>
-<body>
-    <h1>{{ header }}</h1>
-</body>
-</html>
-EOF
-
-# Create a README.md file
-echo "# 0x02-i18n Project" > README.md
-
-# Create a virtual environment
-python3 -m venv venv
-
-# Activate the virtual environment
-source venv/bin/activate
-
-# Install Flask and Flask-Babel
-pip install Flask==2.0.0 flask_babel==2.0.0
-
-# Notify the user
-echo "Setup complete. You can now run your Flask app with ./4-app.py"
