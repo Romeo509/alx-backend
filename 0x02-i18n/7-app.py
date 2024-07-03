@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-6-app.py
+7-app.py
 
-Flask app demonstrating user login system mock with internationalization
-(i18n) using Flask-Babel.
+Flask app demonstrating user login system mock with internationalization 
+(i18n) and timezone selection using Flask-Babel.
 
 Requirements:
 - Ubuntu 18.04 LTS
@@ -14,11 +14,11 @@ Requirements:
 """
 
 from flask import Flask, render_template, request, g
-from flask_babel import Babel, _
+from flask_babel import Babel, _, lazy_gettext as _l
+import pytz
 
 app = Flask(__name__)
 babel = Babel(app)
-
 
 class Config:
     """
@@ -33,7 +33,6 @@ class Config:
     BABEL_DEFAULT_LOCALE = "en"
     BABEL_DEFAULT_TIMEZONE = "UTC"
 
-
 app.config.from_object(Config)
 
 users = {
@@ -42,7 +41,6 @@ users = {
     3: {"name": "Spock", "locale": "kg", "timezone": "Vulcan"},
     4: {"name": "Teletubby", "locale": None, "timezone": "Europe/London"},
 }
-
 
 def get_user():
     """
@@ -57,7 +55,6 @@ def get_user():
     except (TypeError, ValueError):
         return None
 
-
 @app.before_request
 def before_request():
     """
@@ -66,12 +63,11 @@ def before_request():
     """
     g.user = get_user()
 
-
 @babel.localeselector
 def get_locale():
     """
     Function to determine the best-matching language for the user based on
-    the "locale" query parameter, the user's locale, or the Accept-Language
+    the "locale" query parameter, the user's locale, or the Accept-Language 
     header in the request.
 
     Returns:
@@ -84,6 +80,32 @@ def get_locale():
         return g.user["locale"]
     return request.accept_languages.best_match(app.config["LANGUAGES"])
 
+@babel.timezoneselector
+def get_timezone():
+    """
+    Function to determine the best-matching timezone for the user based on
+    the "timezone" query parameter, the user's timezone setting, or defaulting
+    to UTC if no valid timezone is found.
+
+    Returns:
+    - Best-matching timezone name (e.g., "Europe/Paris").
+    """
+    timezone = request.args.get("timezone")
+    if timezone:
+        try:
+            pytz.timezone(timezone)
+            return timezone
+        except pytz.UnknownTimeZoneError:
+            pass
+    
+    if g.user and g.user["timezone"]:
+        try:
+            pytz.timezone(g.user["timezone"])
+            return g.user["timezone"]
+        except pytz.UnknownTimeZoneError:
+            pass
+    
+    return app.config["BABEL_DEFAULT_TIMEZONE"]
 
 @app.route("/")
 def index():
@@ -91,10 +113,9 @@ def index():
     Route for the index page.
 
     Returns:
-    - Rendered template "6-index.html" with translated messages.
+    - Rendered template "7-index.html" with translated messages.
     """
-    return render_template("6-index.html")
-
+    return render_template("7-index.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
