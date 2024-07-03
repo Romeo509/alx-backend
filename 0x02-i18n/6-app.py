@@ -1,35 +1,9 @@
-#!/bin/bash
-
-# Ensure the script is run from the 0x02-i18n directory
-if [ "$(basename $(pwd))" != "0x02-i18n" ]; then
-    echo "Please run this script from the 0x02-i18n directory."
-    exit 1
-fi
-
-# Function to create Python files and templates
-create_files() {
-    local app_file=$1
-    local template_file=$2
-    local app_content=$3
-    local template_content=$4
-
-    # Create Python file
-    echo "$app_content" > "$app_file"
-    chmod +x "$app_file"
-
-    # Create templates directory if it doesn't exist
-    mkdir -p templates
-
-    # Create template file
-    echo "$template_content" > "templates/$template_file"
-}
-
-# 6-app.py content
-app_content='#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 6-app.py
 
-Flask app demonstrating user login system mock with internationalization (i18n) using Flask-Babel.
+Flask app demonstrating user login system mock with internationalization
+(i18n) using Flask-Babel.
 
 Requirements:
 - Ubuntu 18.04 LTS
@@ -41,10 +15,10 @@ Requirements:
 
 from flask import Flask, render_template, request, g
 from flask_babel import Babel, _
-import pytz
 
 app = Flask(__name__)
 babel = Babel(app)
+
 
 class Config:
     """
@@ -59,6 +33,7 @@ class Config:
     BABEL_DEFAULT_LOCALE = "en"
     BABEL_DEFAULT_TIMEZONE = "UTC"
 
+
 app.config.from_object(Config)
 
 users = {
@@ -67,6 +42,7 @@ users = {
     3: {"name": "Spock", "locale": "kg", "timezone": "Vulcan"},
     4: {"name": "Teletubby", "locale": None, "timezone": "Europe/London"},
 }
+
 
 def get_user():
     """
@@ -81,6 +57,7 @@ def get_user():
     except (TypeError, ValueError):
         return None
 
+
 @app.before_request
 def before_request():
     """
@@ -89,11 +66,13 @@ def before_request():
     """
     g.user = get_user()
 
+
 @babel.localeselector
 def get_locale():
     """
     Function to determine the best-matching language for the user based on
-    the "locale" query parameter, the user\'s locale, or the Accept-Language header in the request.
+    the "locale" query parameter, the user's locale, or the Accept-Language
+    header in the request.
 
     Returns:
     - Best-matching language code ("en" or "fr").
@@ -105,6 +84,7 @@ def get_locale():
         return g.user["locale"]
     return request.accept_languages.best_match(app.config["LANGUAGES"])
 
+
 @app.route("/")
 def index():
     """
@@ -115,43 +95,6 @@ def index():
     """
     return render_template("6-index.html")
 
+
 if __name__ == "__main__":
     app.run(debug=True)
-'
-
-# 6-index.html content
-template_content='<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ _("home_title") }}</title>
-</head>
-<body>
-    <h1>{{ _("home_header") }}</h1>
-    {% if g.user %}
-        <p>{{ _("logged_in_as", username=g.user["name"]) }}</p>
-    {% else %}
-        <p>{{ _("not_logged_in") }}</p>
-    {% endif %}
-</body>
-</html>
-'
-
-# Create 6-app.py and 6-index.html
-create_files "6-app.py" "6-index.html" "$app_content" "$template_content"
-
-# Create a README.md file if it doesn't exist
-if [ ! -f README.md ]; then
-    echo "# 0x02-i18n Project" > README.md
-fi
-
-# Create a virtual environment
-python3 -m venv venv
-
-# Activate the virtual environment
-source venv/bin/activate
-
-# Install Flask and Flask-Babel
-pip install Flask==2.0.0 flask_babel==2.0.0
-
-# Notify the user
-echo "Setup complete. You can now run your Flask app with ./6-app.py"
