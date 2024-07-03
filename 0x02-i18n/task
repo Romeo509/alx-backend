@@ -1,0 +1,141 @@
+#!/bin/bash
+# setup_i18n.sh
+
+# Ensure the script exits on any error
+set -e
+
+# Create project structure
+mkdir -p alx-backend/0x02-i18n/templates alx-backend/0x02-i18n/translations/{en,fr}/LC_MESSAGES
+
+# Create and activate a virtual environment
+python3 -m venv alx-backend/0x02-i18n/venv
+source alx-backend/0x02-i18n/venv/bin/activate
+
+# Install required packages
+pip install flask flask_babel
+
+# Create 3-app.py
+cat << 'EOF' > alx-backend/0x02-i18n/3-app.py
+#!/usr/bin/env python3
+"""
+3-app.py
+
+Flask app demonstrating internationalization (i18n) using Flask-Babel.
+
+Requirements:
+- Ubuntu 18.04 LTS
+- Python 3.7
+- pycodestyle (version 2.5)
+- README.md file present
+- Python file ends with a new line
+"""
+
+from flask import Flask, render_template, request
+from flask_babel import Babel, _
+
+app = Flask(__name__)
+babel = Babel(app)
+
+class Config:
+    """
+    Config class for Flask app configuration.
+
+    Attributes:
+    - LANGUAGES: List of available languages.
+    - BABEL_DEFAULT_LOCALE: Default locale for Babel.
+    - BABEL_DEFAULT_TIMEZONE: Default timezone for Babel.
+    """
+    LANGUAGES = ["en", "fr"]
+    BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'UTC'
+
+app.config.from_object(Config)
+
+@babel.localeselector
+def get_locale():
+    """
+    Function to determine the best-matching language for the user based on
+    the 'locale' query parameter or the Accept-Language header in the request.
+
+    Returns:
+    - Best-matching language code ('en' or 'fr').
+    """
+    locale = request.args.get('locale')
+    if locale in app.config['LANGUAGES']:
+        return locale
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
+
+@app.route('/')
+def index():
+    """
+    Route for the index page.
+
+    Returns:
+    - Rendered template '3-index.html' with translated messages.
+    """
+    return render_template('3-index.html', title=_('home_title'), header=_('home_header'))
+
+if __name__ == '__main__':
+    app.run(debug=True)
+EOF
+
+# Create the babel.cfg file
+cat << 'EOF' > alx-backend/0x02-i18n/babel.cfg
+[python: **.py]
+[jinja2: **/templates/**.html]
+extensions=jinja2.ext.autoescape,jinja2.ext.with_
+EOF
+
+# Create the 3-index.html template
+cat << 'EOF' > alx-backend/0x02-i18n/templates/3-index.html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h1>{{ header }}</h1>
+</body>
+</html>
+EOF
+
+# Extract messages
+cd alx-backend/0x02-i18n
+pybabel extract -F babel.cfg -o messages.pot .
+
+# Initialize translations
+pybabel init -i messages.pot -d translations -l en
+pybabel init -i messages.pot -d translations -l fr
+
+# Provide translations
+cat << 'EOF' > translations/en/LC_MESSAGES/messages.po
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "home_title"
+msgstr "Welcome to Holberton"
+
+msgid "home_header"
+msgstr "Hello world!"
+EOF
+
+cat << 'EOF' > translations/fr/LC_MESSAGES/messages.po
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "home_title"
+msgstr "Bienvenue chez Holberton"
+
+msgid "home_header"
+msgstr "Bonjour monde!"
+EOF
+
+# Compile translations
+pybabel compile -d translations
+
+# Make 3-app.py executable
+chmod +x 3-app.py
+
+echo "Setup complete. You can now run the Flask app with ./3-app.py"
