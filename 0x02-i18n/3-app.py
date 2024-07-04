@@ -12,7 +12,7 @@ Requirements:
 - Python file ends with a new line
 """
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_babel import Babel, _
 
 app = Flask(__name__)
@@ -45,9 +45,7 @@ def get_locale():
     Returns:
     - Best-matching language code ('en' or 'fr').
     """
-    # Replace with logic to determine the best-matching language
-    # For now, use a simple example:
-    return 'en'
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
 @app.route('/')
