@@ -34,6 +34,7 @@ class Config:
 
 
 app.config.from_object(Config)
+"""Testing documentation at this side"""
 
 
 @babel.localeselector
