@@ -14,6 +14,7 @@ Requirements:
 
 from flask import Flask, render_template, request
 from flask_babel import Babel, _
+"""Testing doc here"""
 
 app = Flask(__name__)
 babel = Babel(app)
